@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Daily System — Longevity Protocol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #F5F2EC;
+      --ink:         #0D0C09;
+      --ink-dim:     #5C5849;
+      --ink-faint:   #9C9487;
+      --stone:       #C6BCAF;
+      --warm:        #A08C72;
+      --gold:        #8A7055;
+      --cream:       #EDE8DF;
+      --white:       #FDFCF9;
+      --border:      rgba(13,12,9,0.10);
+
+      --c-gold:      #D4A853;
+      --c-green:     #7A9E7E;
+      --c-slate:     #8A9EC0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.028; pointer-events: none; z-index: 999;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 60px;
+      background: rgba(245,242,236,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 800; font-size: 14px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ink); text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 36px; list-style: none;
+    }
+    .nav-links a {
+      font-size: 13px; font-weight: 500; color: var(--ink-dim);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    .btn-nav-solid {
+      padding: 10px 22px;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      background: var(--ink); color: var(--bg);
+      border-radius: 4px; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-nav-solid:hover { background: #1E1C16; }
+
+    /* ─── PRODUCTS HERO ─── */
+    .products-hero {
+      padding: 160px 80px 100px;
+      text-align: center;
+      position: relative; overflow: hidden;
+      background: var(--cream);
+    }
+
+    .ph-eyebrow {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 24px;
+    }
+
+    .ph-h1 {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(52px, 7vw, 96px);
+      font-weight: 900; line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+    }
+
+    .ph-sub {
+      font-size: 17px; color: var(--ink-dim);
+      max-width: 520px; margin: 0 auto 56px;
+      line-height: 1.65;
+    }
+
+    /* Tab nav */
+    .product-tabs {
+      display: inline-flex;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px;
+      gap: 2px;
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      border: none; background: transparent;
+      color: var(--ink-dim); cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active {
+      background: var(--ink); color: var(--bg);
+    }
+
+    /* Decorative rings */
+    .ph-ring {
+      position: absolute;
+      border-radius: 50%; border: 1px solid rgba(13,12,9,0.06);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* ─── PRODUCT DETAIL ─── */
+    .product-detail {
+      display: none; padding: 0;
+    }
+    .product-detail.active { display: block; }
+
+    /* Hero product section */
+    .pd-hero {
+      padding: 100px 80px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+
+    .pd-eyebrow {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .pd-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    .pd-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
+    .pd-h2 {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(44px, 5.5vw, 72px);
+      font-weight: 900; line-height: 0.97;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .pd-tagline {
+      font-size: 16px; color: var(--ink-dim);
+      line-height: 1.7; margin-bottom: 36px;
+      max-width: 440px;
+    }
+
+    .pd-ingredients {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 40px;
+    }
+
+    .ing-tag {
+      padding: 8px 16px;
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: 40px;
+      font-size: 12px; font-weight: 500; color: var(--ink-dim);
+    }
+
+    .pd-price-row {
+      display: flex; align-items: flex-end; gap: 24px;
+      margin-bottom: 28px; flex-wrap: wrap;
+    }
+
+    .pd-price {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 48px; font-weight: 900;
+      line-height: 1; letter-spacing: -0.02em;
+    }
+
+    .pd-price-note { font-size: 13px; color: var(--ink-faint); }
+
+    .pd-actions { display: flex; gap: 12px; }
+
+    .btn-pd-primary {
+      padding: 16px 32px;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      background: var(--ink); color: var(--bg);
+      border-radius: 5px; border: none;
+      text-decoration: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+    .btn-pd-primary:hover { background: #1E1C16; transform: translateY(-2px); }
+
+    .btn-pd-ghost {
+      padding: 16px 24px;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      background: transparent; color: var(--ink-dim);
+      border: 1px solid var(--border);
+      border-radius: 5px; text-decoration: none;
+      cursor: pointer; transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-pd-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* Visual card */
+    .pd-visual {
+      position: relative;
+    }
+
+    .pd-card {
+      border-radius: 20px; padding: 56px 48px;
+      position: relative; overflow: hidden;
+      min-height: 480px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    .pd-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+    }
+
+    .cellular-card { background: #1A1610; }
+    .restore-card  { background: #101A12; }
+    .sleep-card    { background: #10121A; }
+
+    .pd-card-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      opacity: 0.35;
+      color: #FDFCF9;
+    }
+
+    .pd-card-name {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 52px; font-weight: 900;
+      color: #FDFCF9; line-height: 1.0;
+      letter-spacing: -0.025em;
+    }
+
+    .pd-card-sub {
+      font-size: 13px; opacity: 0.40; color: #FDFCF9;
+      margin-top: 8px;
+    }
+
+    .pd-card-circle {
+      position: absolute; border-radius: 50%;
+      opacity: 0.12;
+    }
+
+    .pd-card-timing {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 40px;
+      font-size: 12px; color: rgba(255,255,255,0.65);
+      align-self: flex-start;
+    }
+
+    /* Details grid */
+    .pd-details {
+      padding: 0 80px 100px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+
+    .pd-detail-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 32px;
+    }
+
+    .pdc-title {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 16px; font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .pdc-body {
+      font-size: 13.5px; color: var(--ink-dim); line-height: 1.7;
+    }
+
+    /* Who it's for */
+    .pd-who {
+      padding: 80px;
+      background: var(--ink);
+    }
+
+    .pd-who-header {
+      display: flex; align-items: flex-end;
+      justify-content: space-between; margin-bottom: 48px;
+    }
+
+    .pd-who-h2 {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800; color: #FDFCF9;
+      letter-spacing: -0.02em;
+    }
+
+    .who-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    .who-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 28px;
+    }
+
+    .who-icon { font-size: 24px; margin-bottom: 14px; }
+
+    .who-title {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: #FDFCF9; margin-bottom: 8px;
+    }
+
+    .who-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+
+    /* ─── SYSTEM SECTION ─── */
+    .system-section {
+      padding: 120px 80px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .sys-eyebrow {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 20px;
+    }
+
+    .sys-h2 {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(40px, 5vw, 68px);
+      font-weight: 900; line-height: 1.0;
+      letter-spacing: -0.03em; margin-bottom: 20px;
+    }
+
+    .sys-sub {
+      font-size: 16px; color: var(--ink-dim);
+      max-width: 480px; margin: 0 auto 64px; line-height: 1.65;
+    }
+
+    .sys-bundle {
+      background: var(--ink);
+      border-radius: 20px; padding: 56px 64px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 32px; align-items: center;
+      text-align: left; position: relative; overflow: hidden;
+    }
+
+    .sys-bundle::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: var(--warm); opacity: 0.06;
+    }
+
+    .sys-bundle-items { display: flex; flex-direction: column; gap: 14px; }
+
+    .sbi {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+    }
+
+    .sbi-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .sbi-name {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 14px; font-weight: 700; color: #FDFCF9;
+    }
+
+    .sbi-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+    .sbi-price {
+      margin-left: auto;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.40);
+      text-decoration: line-through;
+    }
+
+    .sys-bundle-center { text-align: center; }
+
+    .sbc-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 16px;
+    }
+
+    .sbc-price {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 64px; font-weight: 900; color: #FDFCF9;
+      letter-spacing: -0.03em; line-height: 1;
+    }
+
+    .sbc-per { font-size: 13px; color: rgba(255,255,255,0.35); margin-top: 6px; }
+
+    .sbc-saving {
+      display: inline-block; margin-top: 12px;
+      background: rgba(160,140,114,0.20);
+      color: var(--warm); padding: 5px 14px;
+      border-radius: 40px; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .sys-bundle-right { text-align: center; }
+
+    .sbr-cta {
+      display: block; padding: 18px 32px;
+      background: var(--warm); color: var(--ink);
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      border-radius: 6px; text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      margin-bottom: 16px;
+    }
+    .sbr-cta:hover { background: #B09A80; transform: translateY(-2px); }
+
+    .sbr-note { font-size: 12px; color: rgba(255,255,255,0.25); line-height: 1.5; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--ink);
+      padding: 60px 80px 40px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 800; font-size: 13px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #FDFCF9;
+    }
+
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.25); }
+
+    .footer-back {
+      font-size: 12px; color: rgba(255,255,255,0.35);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-back:hover { color: rgba(255,255,255,0.70); }
+
+    /* Reveal */
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Mobile */
+    @media (max-width: 960px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .products-hero { padding: 120px 24px 60px; }
+      .pd-hero { grid-template-columns: 1fr; padding: 80px 24px; gap: 48px; }
+      .pd-details { grid-template-columns: 1fr; padding: 0 24px 60px; }
+      .pd-who { padding: 60px 24px; }
+      .pd-who-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .who-grid { grid-template-columns: 1fr; }
+      .system-section { padding: 80px 24px; }
+      .sys-bundle { grid-template-columns: 1fr; padding: 36px 24px; gap: 40px; }
+      .sys-bundle-center { border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 32px 0; }
+      footer { padding: 40px 24px; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="index.html" class="nav-logo">Longevity Protocol</a>
+    <ul class="nav-links">
+      <li><a href="index.html#how">How it works</a></li>
+      <li><a href="index.html#quiz">The Quiz</a></li>
+      <li><a href="#">Products</a></li>
+      <li><a href="index.html#philosophy">Philosophy</a></li>
+    </ul>
+    <a href="landing.html" class="btn-nav-solid">Request Access</a>
+  </nav>
+
+  <!-- Products Hero -->
+  <section class="products-hero">
+    <div class="ph-ring" style="width:700px;height:700px;"></div>
+    <div class="ph-ring" style="width:500px;height:500px;opacity:0.5;"></div>
+    <div class="ph-ring" style="width:300px;height:300px;opacity:0.3;"></div>
+    <div style="position:relative;z-index:2;">
+      <p class="ph-eyebrow">The Daily System</p>
+      <h1 class="ph-h1">Three formulas.<br />One protocol.</h1>
+      <p class="ph-sub">Never presented individually. Always experienced as a system. This is how the protocol works — because the compounds compound.</p>
+      <div class="product-tabs">
+        <button class="tab-btn active" onclick="showProduct('cellular', this)">CELLULAR</button>
+        <button class="tab-btn" onclick="showProduct('restore', this)">RESTORE</button>
+        <button class="tab-btn" onclick="showProduct('sleep', this)">SLEEP</button>
+        <button class="tab-btn" onclick="showProduct('system', this)">Daily System</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CELLULAR PRODUCT ─────────────────────── -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="product-detail active" id="detail-cellular">
+
+    <div class="pd-hero">
+      <div class="reveal">
+        <div class="pd-eyebrow">
+          <div class="pd-dot" style="background:var(--c-gold);"></div>
+          <div class="pd-label">Cellular · Daily Renewal</div>
+        </div>
+        <h2 class="pd-h2">Fuel for<br />your cells.</h2>
+        <p class="pd-tagline">
+          NAD+ is the molecule that powers every cell in your body. It declines by roughly 50% between ages 40 and 60. NMN is the most studied precursor to restore it. Every member starts here.
+        </p>
+        <div class="pd-ingredients">
+          <span class="ing-tag">NMN 500mg</span>
+          <span class="ing-tag">β-Nicotinamide Mononucleotide</span>
+          <span class="ing-tag">FDA-cleared Sept 2025</span>
+          <span class="ing-tag">Morning formula</span>
+        </div>
+        <div class="pd-price-row">
+          <div class="pd-price">$79</div>
+          <div class="pd-price-note">per month · 30 servings<br />Subscribe and adjust or pause anytime</div>
+        </div>
+        <div class="pd-actions">
+          <a href="landing.html" class="btn-pd-primary">Request Access</a>
+          <a href="#cellular" class="btn-pd-ghost">Full details ↓</a>
+        </div>
+      </div>
+      <div class="pd-visual reveal">
+        <div class="pd-card cellular-card">
+          <div class="pd-card-circle" style="width:240px;height:240px;background:#D4A853;top:-60px;right:-60px;"></div>
+          <div>
+            <div class="pd-card-label">CELLULAR</div>
+          </div>
+          <div>
+            <div class="pd-card-name">Daily<br />Renewal</div>
+            <div class="pd-card-sub">NMN 500mg · Once daily · Morning</div>
+          </div>
+          <div class="pd-card-timing">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l3 3"/></svg>
+            Take every morning on an empty stomach
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-details reveal" id="cellular">
+      <div class="pd-detail-card">
+        <div class="pdc-title">Why NAD+ matters</div>
+        <div class="pdc-body">NAD+ (Nicotinamide Adenine Dinucleotide) is present in every cell in your body. It's essential for energy metabolism, DNA repair, and cellular signalling. The problem: it declines with age — rapidly. By your mid-forties, cellular NAD+ levels are roughly half what they were in your twenties. NMN is the precursor that your body uses to manufacture NAD+.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">Why 500mg</div>
+        <div class="pdc-body">Most NMN products on the market dose at 250mg — positioned for price competitiveness rather than efficacy. We use 500mg because that is the dose range used in human clinical trials showing meaningful results in NAD+ biomarker levels. The extra cost is absorbed in our margin, not passed to you.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">The FDA clearance</div>
+        <div class="pdc-body">In September 2025, NMN was formally cleared by the FDA as a dietary supplement ingredient after a period of regulatory uncertainty. This is significant. It means the ingredient is legal to sell, clearly labelled, and the category has legitimate standing. We always knew it would — and we were ready the day it happened.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">Protocol positioning</div>
+        <div class="pdc-body">CELLULAR is the foundation of the system. For most members, it is the first product in the protocol. In high-stress profiles, we sometimes have members start with RESTORE first — but CELLULAR is always in the stack. It is the reason the other two compounds work better: cellular energy is the substrate everything else builds on.</div>
+      </div>
+    </div>
+
+    <div class="pd-who">
+      <div class="pd-who-header reveal">
+        <h2 class="pd-who-h2">CELLULAR is for you if —</h2>
+      </div>
+      <div class="who-grid reveal">
+        <div class="who-card">
+          <div class="who-icon">🔋</div>
+          <div class="who-title">Your energy has shifted</div>
+          <div class="who-desc">You notice your energy isn't what it was in your thirties. Not dramatically — just a subtle shift. That's not lifestyle. That's biology. This is what addresses it directly.</div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">🕐</div>
+          <div class="who-title">You're in the 40–60 window</div>
+          <div class="who-desc">NAD+ decline is steepest between 40 and 60. If you're in that window, this is the highest-leverage cellular intervention available without a prescription.</div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">🧬</div>
+          <div class="who-title">You think long-term</div>
+          <div class="who-desc">NMN is not a stimulant. You won't feel a jolt. The benefit is cumulative: cellular energy production that compounds over weeks and months, not days.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- RESTORE PRODUCT ──────────────────────── -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="product-detail" id="detail-restore">
+
+    <div class="pd-hero">
+      <div class="reveal">
+        <div class="pd-eyebrow">
+          <div class="pd-dot" style="background:var(--c-green);"></div>
+          <div class="pd-label">Restore · Resilience</div>
+        </div>
+        <h2 class="pd-h2">Recovery<br />and resilience.</h2>
+        <p class="pd-tagline">
+          The number one complaint among 35–50 year olds: stress, poor recovery, and a body that takes longer to bounce back. RESTORE addresses the root — not the symptom.
+        </p>
+        <div class="pd-ingredients">
+          <span class="ing-tag">Magnesium Glycinate 400mg</span>
+          <span class="ing-tag">Ashwagandha KSM-66</span>
+          <span class="ing-tag">Full-spectrum root extract</span>
+          <span class="ing-tag">Morning or midday</span>
+        </div>
+        <div class="pd-price-row">
+          <div class="pd-price">$69</div>
+          <div class="pd-price-note">per month · 30 servings<br />81% gross margin — our highest</div>
+        </div>
+        <div class="pd-actions">
+          <a href="landing.html" class="btn-pd-primary">Request Access</a>
+          <a href="#restore" class="btn-pd-ghost">Full details ↓</a>
+        </div>
+      </div>
+      <div class="pd-visual reveal">
+        <div class="pd-card restore-card">
+          <div class="pd-card-circle" style="width:220px;height:220px;background:#7A9E7E;top:-50px;right:-50px;"></div>
+          <div>
+            <div class="pd-card-label">RESTORE</div>
+          </div>
+          <div>
+            <div class="pd-card-name">Resilience</div>
+            <div class="pd-card-sub">Magnesium Glycinate 400mg + Ashwagandha KSM-66</div>
+          </div>
+          <div class="pd-card-timing">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l3 3"/></svg>
+            Morning or midday with food
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-details reveal" id="restore">
+      <div class="pd-detail-card">
+        <div class="pdc-title">Ashwagandha KSM-66 — the standard</div>
+        <div class="pdc-body">Of all the adaptogens, Ashwagandha has the largest body of human clinical trial data. KSM-66 specifically is the full-spectrum root extract — not a leaf extract or an inferior standardisation. It's the form with the most consistent results across cortisol, stress response, testosterone, thyroid function, and cognitive performance markers.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">Magnesium Glycinate — why this form</div>
+        <div class="pdc-body">Magnesium is involved in over 300 enzymatic reactions in the body. Most people over 35 are deficient — not severely, but functionally. Glycinate is the chelated form with the highest bioavailability and the least digestive disruption. We don't use oxide (cheap, poorly absorbed) or citrate (common but inconsistent). We use Glycinate at the full 400mg dose.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">Why stress disrupts cellular health</div>
+        <div class="pdc-body">Chronic stress elevates cortisol, which depletes magnesium, suppresses testosterone, impairs sleep quality, and — critically — disrupts the same cellular energy pathways that NMN is designed to support. This is why, for high-stress profiles, we often sequence RESTORE before CELLULAR. You cannot optimise a system that is under siege.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">The recovery layer</div>
+        <div class="pdc-body">RESTORE sits in the middle of the system deliberately. It is the modulator. CELLULAR provides the energy substrate. SLEEP provides overnight repair. RESTORE ensures the body's stress response doesn't undermine both. For members with high stress loads, this is often the product that changes their experience of the entire protocol.</div>
+      </div>
+    </div>
+
+    <div class="pd-who">
+      <div class="pd-who-header reveal">
+        <h2 class="pd-who-h2">RESTORE is for you if —</h2>
+      </div>
+      <div class="who-grid reveal">
+        <div class="who-card">
+          <div class="who-icon">🌊</div>
+          <div class="who-title">Stress is physical</div>
+          <div class="who-desc">Your stress doesn't stay in your head. It's in your body — tight shoulders, disrupted sleep, a jaw you clench. RESTORE addresses the physiological response, not just the mental one.</div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">⏱️</div>
+          <div class="who-title">Recovery takes longer</div>
+          <div class="who-desc">You used to bounce back in a day. Now it takes three. That's not weakness — it's a combination of cortisol dysregulation and magnesium depletion. Both are addressable.</div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">🎯</div>
+          <div class="who-title">You need the recovery layer</div>
+          <div class="who-desc">Even for members with low perceived stress, RESTORE provides the hormonal resilience that makes CELLULAR's cellular energy usable. It's the middle of the system for a reason.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SLEEP PRODUCT ────────────────────────── -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="product-detail" id="detail-sleep">
+
+    <div class="pd-hero">
+      <div class="reveal">
+        <div class="pd-eyebrow">
+          <div class="pd-dot" style="background:var(--c-slate);"></div>
+          <div class="pd-label">Sleep · Overnight Repair</div>
+        </div>
+        <h2 class="pd-h2">Overnight<br />repair.</h2>
+        <p class="pd-tagline">
+          Sleep is the most underrated longevity intervention. This formula is felt within days, not weeks — and it drives more word of mouth and subscription retention than anything else we offer.
+        </p>
+        <div class="pd-ingredients">
+          <span class="ing-tag">Magnesium L-Threonate 144mg</span>
+          <span class="ing-tag">L-Theanine 200mg</span>
+          <span class="ing-tag">Crosses blood-brain barrier</span>
+          <span class="ing-tag">45 min before bed</span>
+        </div>
+        <div class="pd-price-row">
+          <div class="pd-price">$65</div>
+          <div class="pd-price-note">per month · 30 servings<br />Fastest felt benefit — drives retention</div>
+        </div>
+        <div class="pd-actions">
+          <a href="landing.html" class="btn-pd-primary">Request Access</a>
+          <a href="#sleep" class="btn-pd-ghost">Full details ↓</a>
+        </div>
+      </div>
+      <div class="pd-visual reveal">
+        <div class="pd-card sleep-card">
+          <div class="pd-card-circle" style="width:220px;height:220px;background:#8A9EC0;top:-50px;right:-50px;"></div>
+          <div>
+            <div class="pd-card-label">SLEEP</div>
+          </div>
+          <div>
+            <div class="pd-card-name">Overnight<br />Repair</div>
+            <div class="pd-card-sub">Mag L-Threonate 144mg + L-Theanine 200mg</div>
+          </div>
+          <div class="pd-card-timing">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            45 minutes before bed
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-details reveal" id="sleep">
+      <div class="pd-detail-card">
+        <div class="pdc-title">Magnesium L-Threonate — why it's different</div>
+        <div class="pdc-body">Most magnesium supplements don't cross the blood-brain barrier efficiently. L-Threonate is the one form that does — developed specifically for neurological applications. It raises cerebrospinal magnesium levels in a way other forms cannot. This is why it affects sleep quality and cognitive function more meaningfully than standard magnesium supplements.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">L-Theanine — the pairing</div>
+        <div class="pdc-body">L-Theanine is an amino acid found naturally in tea that promotes alpha brain wave activity — a state of relaxed alertness that transitions naturally into deep sleep. Combined with Magnesium L-Threonate, it doesn't just help you fall asleep. It improves sleep architecture: more time in deep and REM sleep, which is where cellular repair and memory consolidation happen.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">Felt within days</div>
+        <div class="pdc-body">Most longevity supplements work on a weeks-to-months timeline — which is correct, but difficult for retention. SLEEP is the exception. Most members notice meaningful improvement in sleep quality within 3–7 days. This is the product that creates word of mouth. If someone feels better sleeping within a week, they tell people. That's the retention mechanism built into the formula itself.</div>
+      </div>
+      <div class="pd-detail-card">
+        <div class="pdc-title">The overnight repair function</div>
+        <div class="pdc-body">Sleep is not passive recovery. During deep sleep, the glymphatic system clears metabolic waste from the brain, growth hormone pulses trigger tissue repair, and the immune system consolidates. SLEEP is designed to improve the quality of this repair cycle — not just its duration. That's why we call it Overnight Repair, not "Better Sleep."</div>
+      </div>
+    </div>
+
+    <div class="pd-who">
+      <div class="pd-who-header reveal">
+        <h2 class="pd-who-h2">SLEEP is for you if —</h2>
+      </div>
+      <div class="who-grid reveal">
+        <div class="who-card">
+          <div class="who-icon">🌙</div>
+          <div class="who-title">Sleep isn't deep</div>
+          <div class="who-desc">You might fall asleep fine but wake groggy or unrestored. That's a sleep architecture problem, not a sleep onset problem. L-Threonate + L-Theanine improves quality, not just duration.</div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">🧠</div>
+          <div class="who-title">You want felt results fast</div>
+          <div class="who-desc">SLEEP is our fastest product to produce noticeable change — within days, not weeks. If your sleep profile is poor, this is the product the quiz will lead with, and it's the right call.</div>
+        </div>
+        <div class="who-card">
+          <div class="who-icon">♻️</div>
+          <div class="who-title">Overnight repair matters to you</div>
+          <div class="who-desc">Sleep is when your body does its most important longevity work. If you're not sleeping well, the other two products in your protocol can't compound properly. SLEEP is the foundation of recovery.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- DAILY SYSTEM ─────────────────────────── -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="product-detail" id="detail-system">
+    <div style="padding:100px 80px 60px;">
+      <div class="reveal" style="max-width:680px;margin:0 auto;text-align:center;">
+        <p style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--warm);margin-bottom:24px;">Most Popular · Default Purchase</p>
+        <h2 style="font-family:'Cabinet Grotesk',sans-serif;font-size:clamp(44px,6vw,80px);font-weight:900;line-height:0.97;letter-spacing:-0.03em;margin-bottom:24px;">The Daily System</h2>
+        <p style="font-size:17px;color:var(--ink-dim);line-height:1.65;margin-bottom:48px;">
+          All three. One protocol. Monthly delivery. This is what 80% of our members choose. The system compounds in ways individual supplements don't — and the quiz tells you exactly how to sequence it for your biology.
+        </p>
+      </div>
+      <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;max-width:900px;margin:0 auto 60px;">
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:28px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--c-gold);"></div>
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-dim);">Cellular</span>
+          </div>
+          <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;">Daily Renewal</div>
+          <div style="font-size:12px;color:var(--ink-faint);margin-bottom:20px;line-height:1.5;">NMN 500mg · Morning</div>
+          <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--ink-faint);text-decoration:line-through;">$79</div>
+        </div>
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:28px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--c-green);"></div>
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-dim);">Restore</span>
+          </div>
+          <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;">Resilience</div>
+          <div style="font-size:12px;color:var(--ink-faint);margin-bottom:20px;line-height:1.5;">Magnesium + Ashwagandha</div>
+          <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--ink-faint);text-decoration:line-through;">$69</div>
+        </div>
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:28px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--c-slate);"></div>
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-dim);">Sleep</span>
+          </div>
+          <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;">Overnight Repair</div>
+          <div style="font-size:12px;color:var(--ink-faint);margin-bottom:20px;line-height:1.5;">Mag L-Threonate + L-Theanine</div>
+          <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--ink-faint);text-decoration:line-through;">$65</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System bundle -->
+  <section class="system-section">
+    <p class="sys-eyebrow">The Default Purchase</p>
+    <h2 class="sys-h2">The Daily System</h2>
+    <p class="sys-sub">All three formulas. One protocol. Monthly delivery. The system always leads. Individual products are available — but this is where you start.</p>
+
+    <div class="sys-bundle reveal">
+      <div class="sys-bundle-items">
+        <div class="sbi">
+          <div class="sbi-dot" style="background:var(--c-gold);"></div>
+          <div>
+            <div class="sbi-name">CELLULAR — Daily Renewal</div>
+            <div class="sbi-sub">NMN 500mg · Morning</div>
+          </div>
+          <div class="sbi-price">$79</div>
+        </div>
+        <div class="sbi">
+          <div class="sbi-dot" style="background:var(--c-green);"></div>
+          <div>
+            <div class="sbi-name">RESTORE — Resilience</div>
+            <div class="sbi-sub">Mag + Ashwagandha · AM/Midday</div>
+          </div>
+          <div class="sbi-price">$69</div>
+        </div>
+        <div class="sbi">
+          <div class="sbi-dot" style="background:var(--c-slate);"></div>
+          <div>
+            <div class="sbi-name">SLEEP — Overnight Repair</div>
+            <div class="sbi-sub">Mag L-Threonate + L-Theanine · PM</div>
+          </div>
+          <div class="sbi-price">$65</div>
+        </div>
+      </div>
+
+      <div class="sys-bundle-center">
+        <div class="sbc-label">Daily System Bundle</div>
+        <div class="sbc-price">$189</div>
+        <div class="sbc-per">per month · all three</div>
+        <div class="sbc-saving">Save $24 vs separate</div>
+      </div>
+
+      <div class="sys-bundle-right">
+        <a href="landing.html" class="sbr-cta">Request Access →</a>
+        <p class="sbr-note">Access opens by invitation only.<br />Wave 1 limited to 200 members.<br />No payment until access opens.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-bottom">
+      <div class="footer-logo">Longevity Protocol</div>
+      <p class="footer-copy">© 2026 Longevity Protocol. Confidential pre-launch.</p>
+      <a href="index.html" class="footer-back">← Back to main site</a>
+    </div>
+  </footer>
+
+  <script>
+    // Reveal on scroll
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.10 });
+    document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
+
+    // Tab switching
+    function showProduct(id, btn) {
+      document.querySelectorAll('.product-detail').forEach(d => d.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('detail-' + id).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: document.querySelector('.products-hero').offsetHeight + 80, behavior: 'smooth' });
+    }
+
+    // Hash routing
+    const hash = window.location.hash;
+    if (hash === '#cellular') showProduct('cellular', document.querySelectorAll('.tab-btn')[0]);
+    if (hash === '#restore')  showProduct('restore',  document.querySelectorAll('.tab-btn')[1]);
+    if (hash === '#sleep')    showProduct('sleep',    document.querySelectorAll('.tab-btn')[2]);
+    if (hash === '#system')   showProduct('system',   document.querySelectorAll('.tab-btn')[3]);
+  </script>
+</body>
+</html>

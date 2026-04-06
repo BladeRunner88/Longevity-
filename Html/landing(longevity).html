@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Longevity Protocol — Request Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #F5F2EC;
+      --ink:       #0D0C09;
+      --ink-dim:   #5C5849;
+      --ink-faint: #9C9487;
+      --stone:     #C6BCAF;
+      --warm:      #A08C72;
+      --gold:      #8A7055;
+      --cream:     #EDE8DF;
+      --white:     #FDFCF9;
+      --border:    rgba(13,12,9,0.10);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Grain texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.028;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 56px;
+      mix-blend-mode: normal;
+    }
+
+    .nav-logo {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .nav-badge {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 40px;
+      background: rgba(253,252,249,0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 140px 64px 80px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s ease forwards;
+    }
+
+    .eyebrow-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--warm);
+    }
+
+    .eyebrow-text {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
+    .hero-heading {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(52px, 6vw, 88px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.35s ease forwards;
+    }
+
+    .hero-heading em {
+      font-style: normal;
+      color: var(--warm);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: var(--ink-dim);
+      max-width: 440px;
+      margin-bottom: 52px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.5s ease forwards;
+    }
+
+    /* Waitlist form */
+    .waitlist-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 420px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.65s ease forwards;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .input-row:focus-within {
+      box-shadow: 0 0 0 3px rgba(160, 140, 114, 0.20);
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 16px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .input-row input::placeholder { color: var(--ink-faint); }
+
+    .btn-primary {
+      padding: 16px 28px;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover { background: #1E1C16; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--ink-faint);
+      line-height: 1.5;
+    }
+
+    /* Waitlist counter */
+    .waitlist-count {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 52px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.9s 0.8s ease forwards;
+    }
+
+    .count-faces {
+      display: flex;
+    }
+
+    .count-face {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      margin-left: -8px;
+      overflow: hidden;
+    }
+
+    .count-face:first-child { margin-left: 0; }
+
+    .count-face svg { width: 20px; height: 20px; opacity: 0.5; }
+
+    .count-text strong {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .count-text p {
+      font-size: 12px;
+      color: var(--ink-dim);
+      margin-top: 1px;
+    }
+
+    /* Hero right — visual */
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual {
+      position: absolute;
+      inset: 0;
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-stack {
+      position: relative;
+      width: 320px;
+      height: 420px;
+    }
+
+    .product-card {
+      position: absolute;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 220px;
+      box-shadow: 0 24px 64px rgba(13,12,9,0.08);
+    }
+
+    .product-card:nth-child(1) {
+      top: 0; left: 0;
+      transform: rotate(-4deg);
+      animation: floatA 6s ease-in-out infinite;
+    }
+    .product-card:nth-child(2) {
+      top: 80px; right: 0;
+      transform: rotate(2deg);
+      animation: floatB 7s ease-in-out infinite;
+    }
+    .product-card:nth-child(3) {
+      bottom: 0; left: 30px;
+      transform: rotate(-1deg);
+      animation: floatC 8s ease-in-out infinite;
+    }
+
+    @keyframes floatA { 0%,100%{transform:rotate(-4deg) translateY(0)} 50%{transform:rotate(-4deg) translateY(-12px)} }
+    @keyframes floatB { 0%,100%{transform:rotate(2deg) translateY(-6px)} 50%{transform:rotate(2deg) translateY(6px)} }
+    @keyframes floatC { 0%,100%{transform:rotate(-1deg) translateY(4px)} 50%{transform:rotate(-1deg) translateY(-8px)} }
+
+    .pc-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--warm);
+      margin-bottom: 12px;
+    }
+
+    .pc-name {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .pc-desc {
+      font-size: 12px;
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+
+    .pc-dot {
+      width: 40px; height: 4px;
+      border-radius: 2px;
+      margin-bottom: 16px;
+    }
+
+    /* Wave divider */
+    .wave-divider {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+    }
+
+    /* Marquee strip */
+    .marquee-strip {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 16px 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 0;
+      animation: marquee 30s linear infinite;
+      width: max-content;
+    }
+
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 0 40px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .marquee-sep {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--warm);
+      flex-shrink: 0;
+    }
+
+    @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
+    /* Why section */
+    .section-why {
+      padding: 120px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--warm);
+      margin-bottom: 20px;
+    }
+
+    .section-heading {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(36px, 4vw, 54px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .why-item {
+      padding: 28px;
+      background: var(--cream);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .why-num {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--warm);
+      margin-bottom: 12px;
+    }
+
+    .why-title {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .why-desc {
+      font-size: 13px;
+      color: var(--ink-dim);
+      line-height: 1.6;
+    }
+
+    /* Products preview */
+    .section-products {
+      padding: 80px;
+      background: var(--ink);
+      color: var(--cream);
+    }
+
+    .products-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 56px;
+    }
+
+    .products-heading {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(36px, 4vw, 54px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+    }
+
+    .products-heading span { color: var(--warm); }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .prod-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px;
+      padding: 36px 32px;
+      transition: background 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .prod-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      opacity: 0.05;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .prod-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-4px); }
+    .prod-card:hover::before { opacity: 0.10; transform: scale(1.2); }
+
+    .prod-card.cellular::before { background: #D4A853; }
+    .prod-card.restore::before { background: #7A9E7E; }
+    .prod-card.sleep::before   { background: #7B8EA8; }
+
+    .prod-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prod-tag-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    .cellular .prod-tag-dot { background: #D4A853; }
+    .restore .prod-tag-dot  { background: #7A9E7E; }
+    .sleep .prod-tag-dot    { background: #8A9EC0; }
+
+    .prod-name {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #FDFCF9;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .prod-subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .prod-price {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #FDFCF9;
+    }
+
+    .prod-price span {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.35);
+      margin-left: 4px;
+    }
+
+    .prod-margin {
+      margin-top: 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.30);
+    }
+
+    .system-card {
+      grid-column: 1 / -1;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 16px;
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      margin-top: 4px;
+    }
+
+    .system-left { max-width: 480px; }
+
+    .system-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--warm);
+      margin-bottom: 12px;
+    }
+
+    .system-name {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #FDFCF9;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .system-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.50);
+      line-height: 1.6;
+    }
+
+    .system-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .system-price {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      color: #FDFCF9;
+      line-height: 1;
+    }
+
+    .system-per {
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 4px;
+    }
+
+    .system-saving {
+      margin-top: 12px;
+      display: inline-block;
+      background: rgba(160,140,114,0.20);
+      color: var(--warm);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 5px 12px;
+      border-radius: 40px;
+    }
+
+    /* CTA section */
+    .section-cta {
+      padding: 160px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-bg-ring {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .cta-bg-ring:nth-child(2) { width: 800px; height: 800px; opacity: 0.5; }
+    .cta-bg-ring:nth-child(3) { width: 1000px; height: 1000px; opacity: 0.25; }
+
+    .cta-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--warm);
+      margin-bottom: 24px;
+    }
+
+    .cta-heading {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: clamp(40px, 5vw, 72px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.025em;
+      margin-bottom: 24px;
+    }
+
+    .cta-sub {
+      font-size: 17px;
+      color: var(--ink-dim);
+      max-width: 480px;
+      margin: 0 auto 48px;
+      line-height: 1.6;
+    }
+
+    .cta-form {
+      display: inline-flex;
+      gap: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(13,12,9,0.08);
+    }
+
+    .cta-form input {
+      padding: 18px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--ink);
+      width: 320px;
+    }
+
+    .cta-form input::placeholder { color: var(--ink-faint); }
+
+    .cta-form .btn-primary { border-radius: 0; }
+
+    .cta-positions {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Success state */
+    .form-success {
+      display: none;
+      padding: 16px 24px;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .form-success strong { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 700; }
+
+    /* Mobile */
+    @media (max-width: 900px) {
+      nav { padding: 24px 28px; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-left { padding: 120px 28px 60px; }
+      .hero-right { display: none; }
+      .section-why { grid-template-columns: 1fr; padding: 80px 28px; gap: 48px; }
+      .why-grid { grid-template-columns: 1fr; }
+      .section-products { padding: 60px 28px; }
+      .products-header { flex-direction: column; align-items: flex-start; gap: 24px; }
+      .products-grid { grid-template-columns: 1fr; }
+      .system-card { flex-direction: column; padding: 32px; }
+      .system-right { text-align: left; }
+      .section-cta { padding: 80px 28px; }
+      .cta-form { flex-direction: column; width: 100%; max-width: 380px; }
+      .cta-form input { width: 100%; }
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">Longevity Protocol</div>
+    <div class="nav-badge">Early Access · April 2026</div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <div class="eyebrow-dot"></div>
+        <span class="eyebrow-text">Launching Wave 1 · 200 Members Only</span>
+      </div>
+
+      <h1 class="hero-heading">
+        Your longevity<br />
+        <em>protocol.</em><br />
+        Personalised.
+      </h1>
+
+      <p class="hero-sub">
+        Not a supplement brand. A protocol platform. An intelligent quiz builds your personal system — then we deliver it to your door every month.
+      </p>
+
+      <div class="waitlist-form">
+        <div class="input-row">
+          <input type="email" id="hero-email" placeholder="Enter your email address" />
+          <button class="btn-primary" onclick="submitWaitlist('hero')">Request Access</button>
+        </div>
+        <div class="form-success" id="hero-success">
+          <strong>You're on the list.</strong> We'll email you when your access window opens. You are <strong>#<span class="position-num">847</span></strong> on the access list.
+        </div>
+        <p class="form-note">No spam. No discounts. Just a notification when your spot opens. Unsubscribe anytime.</p>
+      </div>
+
+      <div class="waitlist-count">
+        <div class="count-faces">
+          <div class="count-face">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div class="count-face">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div class="count-face">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div class="count-face">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+        </div>
+        <div class="count-text">
+          <strong>847 people</strong> ahead of you
+          <p>on the Wave 1 access list</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-visual">
+        <div class="product-stack">
+          <div class="product-card cellular">
+            <div class="pc-tag">CELLULAR</div>
+            <div class="pc-dot" style="background:#D4A853"></div>
+            <div class="pc-name">Daily Renewal</div>
+            <div class="pc-desc">NMN 500mg · Morning formula. Restores cellular energy production.</div>
+          </div>
+          <div class="product-card restore">
+            <div class="pc-tag">RESTORE</div>
+            <div class="pc-dot" style="background:#7A9E7E"></div>
+            <div class="pc-name">Resilience</div>
+            <div class="pc-desc">Magnesium + Ashwagandha KSM-66. For stress and recovery.</div>
+          </div>
+          <div class="product-card sleep">
+            <div class="pc-tag">SLEEP</div>
+            <div class="pc-dot" style="background:#8A9EC0"></div>
+            <div class="pc-name">Overnight Repair</div>
+            <div class="pc-desc">Mag L-Threonate + L-Theanine. Felt within days, not weeks.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <div class="marquee-item">The quiz is the product <span class="marquee-sep"></span></div>
+      <div class="marquee-item">Longevity as a system <span class="marquee-sep"></span></div>
+      <div class="marquee-item">NMN 500mg · FDA cleared Sept 2025 <span class="marquee-sep"></span></div>
+      <div class="marquee-item">Personalised protocol · monthly delivery <span class="marquee-sep"></span></div>
+      <div class="marquee-item">76%+ gross margin · zero inventory risk <span class="marquee-sep"></span></div>
+      <div class="marquee-item">Wave 1 · 200 members only <span class="marquee-sep"></span></div>
+      <div class="marquee-item">The quiz is the product <span class="marquee-sep"></span></div>
+      <div class="marquee-item">Longevity as a system <span class="marquee-sep"></span></div>
+      <div class="marquee-item">NMN 500mg · FDA cleared Sept 2025 <span class="marquee-sep"></span></div>
+      <div class="marquee-item">Personalised protocol · monthly delivery <span class="marquee-sep"></span></div>
+      <div class="marquee-item">76%+ gross margin · zero inventory risk <span class="marquee-sep"></span></div>
+      <div class="marquee-item">Wave 1 · 200 members only <span class="marquee-sep"></span></div>
+    </div>
+  </div>
+
+  <!-- Why different -->
+  <section class="section-why">
+    <div class="reveal">
+      <div class="section-label">The difference</div>
+      <h2 class="section-heading">Built different.<br />Priced with<br />conviction.</h2>
+    </div>
+    <div class="why-grid reveal">
+      <div class="why-item">
+        <div class="why-num">01</div>
+        <div class="why-title">The quiz is the product</div>
+        <div class="why-desc">Seven questions. Three minutes. A protocol output that feels genuinely made for you — not a generic vitamin pack.</div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">02</div>
+        <div class="why-title">Longevity-specific</div>
+        <div class="why-desc">Nobody has built a longevity protocol platform combining an intelligent quiz, personalised system, and premium ritual.</div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">03</div>
+        <div class="why-title">No discounts. Ever.</div>
+        <div class="why-desc">The price is the signal. We run out of stock before we discount. Currently unavailable is more powerful than 20% off.</div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">04</div>
+        <div class="why-title">Real scarcity</div>
+        <div class="why-desc">We open 200 spots. We close them. We open 200 more. This is genuine — managing supply chain and onboarding quality deliberately.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="section-products">
+    <div class="products-header reveal">
+      <h2 class="products-heading">Three products.<br /><span>One system.</span></h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.40);max-width:280px;line-height:1.6;">
+        Never lead with individual products. Always lead with the Daily System.
+      </p>
+    </div>
+    <div class="products-grid reveal">
+      <div class="prod-card cellular">
+        <div class="prod-tag"><span class="prod-tag-dot"></span>Cellular</div>
+        <div class="prod-name">Daily Renewal</div>
+        <div class="prod-subtitle">NMN 500mg · Morning · Fuel for your cells. FDA-cleared as of September 2025.</div>
+        <div class="prod-price">$79 <span>/ month</span></div>
+        <div class="prod-margin">77% gross margin</div>
+      </div>
+      <div class="prod-card restore">
+        <div class="prod-tag"><span class="prod-tag-dot"></span>Restore</div>
+        <div class="prod-name">Resilience</div>
+        <div class="prod-subtitle">Magnesium Glycinate 400mg + Ashwagandha KSM-66. The adaptogen with the strongest human trial data.</div>
+        <div class="prod-price">$69 <span>/ month</span></div>
+        <div class="prod-margin">81% gross margin</div>
+      </div>
+      <div class="prod-card sleep">
+        <div class="prod-tag"><span class="prod-tag-dot"></span>Sleep</div>
+        <div class="prod-name">Overnight Repair</div>
+        <div class="prod-subtitle">Magnesium L-Threonate 144mg + L-Theanine 200mg. Felt within days, not weeks.</div>
+        <div class="prod-price">$65 <span>/ month</span></div>
+        <div class="prod-margin">77% gross margin</div>
+      </div>
+      <div class="system-card">
+        <div class="system-left">
+          <div class="system-eyebrow">Most popular · Start here</div>
+          <div class="system-name">The Daily System</div>
+          <div class="system-desc">All three products. One protocol. Delivered monthly. This is what 80% of members choose — and the only way we recommend starting. The system compounds. Individual products don't.</div>
+        </div>
+        <div class="system-right">
+          <div class="system-price">$189</div>
+          <div class="system-per">per month · all three</div>
+          <div class="system-saving">Save $24 vs separate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-cta">
+    <div class="cta-bg-ring"></div>
+    <div class="cta-bg-ring"></div>
+    <div class="cta-bg-ring"></div>
+    <div class="cta-content reveal">
+      <p class="cta-eyebrow">Wave 1 · 200 spots</p>
+      <h2 class="cta-heading">Take the quiz.<br />Get your protocol.</h2>
+      <p class="cta-sub">Join the waitlist. When your access window opens, take the 3-minute quiz and receive your personalised longevity protocol.</p>
+      <div>
+        <div class="cta-form">
+          <input type="email" id="cta-email" placeholder="Your email address" />
+          <button class="btn-primary" onclick="submitWaitlist('cta')">Join Waitlist</button>
+        </div>
+        <div class="form-success" id="cta-success" style="margin-top:16px;display:none;max-width:420px;margin-left:auto;margin-right:auto;">
+          <strong>You're in.</strong> We'll notify you when your access window opens. Position: <strong>#<span class="position-num">848</span></strong>.
+        </div>
+        <p class="cta-positions">847 people ahead of you · No payment until access opens</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">Longevity Protocol</div>
+    <p class="footer-note">© 2026 · Confidential pre-launch · All rights reserved</p>
+    <p class="footer-note">
+      <a href="index.html" style="color:var(--ink-dim);text-decoration:none;font-size:12px;">View full site →</a>
+    </p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => obs.observe(r));
+
+    // Waitlist submit
+    let submittedCount = 847;
+    function submitWaitlist(context) {
+      const emailEl = document.getElementById(context + '-email');
+      const successEl = document.getElementById(context + '-success');
+      const email = emailEl.value.trim();
+      if (!email || !email.includes('@')) {
+        emailEl.style.outline = '2px solid #C0714A';
+        emailEl.focus();
+        setTimeout(() => emailEl.style.outline = '', 2000);
+        return;
+      }
+      submittedCount++;
+      // Update all position numbers
+      document.querySelectorAll('.position-num').forEach(el => el.textContent = submittedCount);
+      emailEl.closest('.input-row, .cta-form') && (emailEl.closest('.input-row, .cta-form').style.display = 'none');
+      successEl.style.display = 'block';
+      // Update waitlist counter
+      const strong = document.querySelector('.count-text strong');
+      if (strong) strong.textContent = submittedCount + ' people';
+    }
+  </script>
+</body>
+</html>
