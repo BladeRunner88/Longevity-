@@ -28,7 +28,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${inter.variable} min-h-screen flex flex-col antialiased`}>
+      <body
+        className={`${inter.variable} min-h-screen bg-bg text-ink antialiased`}
+      >
         {children}
       </body>
     </html>
